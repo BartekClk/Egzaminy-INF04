@@ -1,0 +1,813 @@
+# Przykłady i Metody dla Elementów PyQt6 (Rozbudowane)
+
+## Spis Treści
+
+1.  [Widgety](#widgety)
+    *   [1.1. Podstawowe widgety](#podstawowe-widgety)
+        *   [1.1.1. QLabel](#qlabel)
+        *   [1.1.2. QPushButton](#qpushbutton)
+        *   [1.1.3. QLineEdit](#qlineedit)
+        *   [1.1.4. QCheckBox](#qcheckbox)
+        *   [1.1.5. QRadioButton](#qradiobutton)
+        *   [1.1.6. QComboBox](#qcombobox)
+    *   [1.2. Widgety do wyświetlania i edycji tekstu](#widgety-do-wyswietlania-i-edycji-tekstu)
+        *   [1.2.1. QTextEdit](#qtextedit)
+        *   [1.2.2. QPlainTextEdit](#qplaintextedit)
+    *  [1.3. Kontenery](#kontenery)
+        *   [1.3.1. QFrame](#qframe)
+        *   [1.3.2. QWidget](#qwidget)
+2.  [Layouty](#layouty)
+    *   [2.1. QVBoxLayout](#qvboxlayout)
+    *   [2.2. QHBoxLayout](#qhboxlayout)
+    *   [2.3. QGridLayout](#qgridlayout)
+    *   [2.4. QFormLayout](#qformlayout)
+3.  [Okna (Windows)](#okna-windows)
+    *   [3.1. QMainWindow](#qmainwindow)
+    *   [3.2. QDialog](#qdialog)
+    *   [3.3. QMessageBox](#qmessagebox)
+4.  [Sygnały i sloty](#sygnaly-i-sloty)
+    *   [4.1. Podłączanie sygnałów do slotów](#podlaczanie-sygnalow-do-slotow)
+    *   [4.2. Sygnały z wbudowanymi parametrami](#sygnaly-z-wbudowanymi-parametrami)
+    *   [4.3. Tworzenie własnych sygnałów](#tworzenie-wlasnych-sygnalow)
+5.  [Style (QSS)](#style-qss)
+    *  [5.1. Zastosowanie styli](#zastosowanie-styli)
+    *  [5.2. Selektory i właściwości](#selektory-i-wlasciwosci)
+
+## 1. Widgety
+
+### 1.1. Podstawowe widgety
+
+#### 1.1.1. QLabel
+
+*   **Opis:** Wyświetla tekst lub obraz.
+*   **Przykłady:**
+
+    ```python
+    from PyQt6.QtWidgets import QLabel, QWidget, QVBoxLayout, QApplication
+    from PyQt6.QtGui import QPixmap
+    import sys
+    class MyWindow(QWidget):
+        def __init__(self) -> None:
+            super().__init__()
+            layout: QVBoxLayout = QVBoxLayout()
+
+            # Tekstowy QLabel
+            label: QLabel = QLabel("Witaj, PyQt6!")
+            label.setStyleSheet("font-size: 20px; color: blue;")
+            layout.addWidget(label)
+
+            # Obrazowy QLabel
+            image_label: QLabel = QLabel()
+            pixmap: QPixmap = QPixmap("python_logo.png")  # Ścieżka do pliku graficznego
+            image_label.setPixmap(pixmap.scaled(100, 100))  # Skalowanie obrazka
+            layout.addWidget(image_label)
+
+            self.setLayout(layout)
+
+    if __name__ == "__main__":
+        app = QApplication(sys.argv)
+        window = MyWindow()
+        window.show()
+        sys.exit(app.exec())
+
+    ```
+
+*   **Wybrane metody:**
+    *   `setText(text: str)`: Ustawia tekst etykiety.
+    *   `setPixmap(pixmap: QPixmap)`: Ustawia obraz etykiety.
+    *   `clear()`: Czyści zawartość etykiety.
+    *   `setAlignment(alignment: Qt.AlignmentFlag)`: Ustawia wyrównanie tekstu (np. `Qt.AlignmentFlag.AlignCenter`).
+    *   `setStyleSheet(style: str)`: Ustawia styl CSS etykiety.
+
+#### 1.1.2. QPushButton
+
+*   **Opis:** Przycisk, na który można kliknąć.
+*   **Przykłady:**
+
+    ```python
+    from PyQt6.QtWidgets import QPushButton, QWidget, QVBoxLayout, QApplication, QMessageBox
+    from PyQt6.QtCore import Qt, QSize
+    from PyQt6 import QtWidgets
+    from PyQt6.QtGui import QIcon
+    import sys
+
+    class MyWindow(QWidget):
+        def __init__(self) -> None:
+            super().__init__()
+
+            layout: QVBoxLayout = QVBoxLayout()
+
+            # Przycisk z tekstem
+            button: QPushButton = QPushButton("Kliknij mnie!")
+            button.clicked.connect(self.on_button_clicked)
+            layout.addWidget(button)
+
+            # Przycisk z ikoną
+            icon_button: QPushButton = QPushButton()
+            icon_button.setIcon(QIcon(self.style().standardIcon(QtWidgets.QStyle.StandardPixmap.SP_MediaPlay)))
+            icon_button.setIconSize(QSize(32, 32))
+            icon_button.clicked.connect(self.on_icon_button_clicked)
+            layout.addWidget(icon_button)
+
+            self.setLayout(layout)
+
+        def on_button_clicked(self) -> None:
+            QMessageBox.information(self, "Komunikat", "Przycisk kliknięty!")
+
+        def on_icon_button_clicked(self) -> None:
+             QMessageBox.information(self, "Komunikat", "Przycisk z ikoną kliknięty!")
+
+    if __name__ == "__main__":
+        app = QApplication(sys.argv)
+        window = MyWindow()
+        window.show()
+        sys.exit(app.exec())
+    ```
+
+*   **Wybrane metody:**
+    *   `setText(text: str)`: Ustawia tekst przycisku.
+    *   `setIcon(icon: QIcon)`: Ustawia ikonę przycisku.
+     *   `setIconSize(size: QSize)`: Ustawia rozmiar ikony.
+    *   `clicked.connect(slot)`: Podłącza sygnał kliknięcia do slotu.
+    *   `setEnabled(enabled: bool)`: Ustawia, czy przycisk jest aktywny.
+    *   `setStyleSheet(style: str)`: Ustawia styl CSS przycisku.
+
+#### 1.1.3. QLineEdit
+
+*   **Opis:** Jednoliniowe pole edycji tekstu.
+*   **Przykłady:**
+
+    ```python
+    from PyQt6.QtWidgets import QLineEdit, QWidget, QVBoxLayout, QApplication, QLabel
+    import sys
+    class MyWindow(QWidget):
+        def __init__(self) -> None:
+            super().__init__()
+
+            layout: QVBoxLayout = QVBoxLayout()
+
+            # Pole edycji tekstu
+            line_edit: QLineEdit = QLineEdit()
+            line_edit.setPlaceholderText("Wpisz tutaj tekst")
+            line_edit.textChanged.connect(self.on_text_changed)
+            layout.addWidget(line_edit)
+
+            #Wyświetlenie tekstu w labelu
+            label: QLabel = QLabel("")
+            layout.addWidget(label)
+            self.label = label
+            self.setLayout(layout)
+
+
+        def on_text_changed(self, text: str) -> None:
+           self.label.setText(text)
+
+    if __name__ == "__main__":
+        app = QApplication(sys.argv)
+        window = MyWindow()
+        window.show()
+        sys.exit(app.exec())
+    ```
+
+*   **Wybrane metody:**
+    *   `setText(text: str)`: Ustawia tekst pola edycji.
+    *   `text()`: Pobiera tekst z pola edycji.
+    *   `setPlaceholderText(text: str)`: Ustawia tekst podpowiedzi.
+    *   `textChanged.connect(slot)`: Podłącza sygnał zmiany tekstu do slotu.
+    *   `setEchoMode(mode: QLineEdit.EchoMode)`: Ustawia tryb wyświetlania tekstu (np. ukryty dla haseł).
+
+#### 1.1.4. QCheckBox
+
+*   **Opis:** Pole wyboru.
+*   **Przykłady:**
+
+    ```python
+    from PyQt6.QtWidgets import QCheckBox, QWidget, QVBoxLayout, QApplication, QLabel
+    from PyQt6.QtCore import Qt
+    import sys
+    class MyWindow(QWidget):
+        def __init__(self) -> None:
+            super().__init__()
+
+            layout: QVBoxLayout = QVBoxLayout()
+
+            # Pole wyboru
+            check_box: QCheckBox = QCheckBox("Zaznacz mnie")
+            check_box.stateChanged.connect(self.on_check_box_changed)
+            layout.addWidget(check_box)
+
+             #Wyświetlenie informacji czy zaznaczone w labelu
+            label: QLabel = QLabel("")
+            layout.addWidget(label)
+            self.label = label
+
+            self.setLayout(layout)
+
+
+        def on_check_box_changed(self, state: int) -> None:
+            if state == Qt.CheckState.Checked.value:
+                self.label.setText("Zaznaczone")
+            else:
+                self.label.setText("Odznaczone")
+
+    if __name__ == "__main__":
+        app = QApplication(sys.argv)
+        window = MyWindow()
+        window.show()
+        sys.exit(app.exec())
+    ```
+
+*   **Wybrane metody:**
+    *   `setText(text: str)`: Ustawia tekst pola wyboru.
+    *   `isChecked()`: Zwraca `True`, jeśli pole jest zaznaczone.
+    *   `setChecked(checked: bool)`: Ustawia stan pola wyboru.
+    *   `stateChanged.connect(slot)`: Podłącza sygnał zmiany stanu do slotu.
+
+#### 1.1.5. QRadioButton
+
+*   **Opis:** Przycisk opcji (umożliwia wybór jednej opcji z grupy).
+*   **Przykłady:**
+
+    ```python
+    from PyQt6.QtWidgets import QRadioButton, QWidget, QVBoxLayout, QApplication, QLabel
+    from PyQt6.QtCore import Qt
+    import sys
+    class MyWindow(QWidget):
+       def __init__(self) -> None:
+           super().__init__()
+
+           layout: QVBoxLayout = QVBoxLayout()
+
+           # Przyciski opcji
+           radio_button1: QRadioButton = QRadioButton("Opcja 1")
+           radio_button1.toggled.connect(self.on_radio_button_changed)
+           layout.addWidget(radio_button1)
+
+           radio_button2: QRadioButton = QRadioButton("Opcja 2")
+           radio_button2.toggled.connect(self.on_radio_button_changed)
+           layout.addWidget(radio_button2)
+
+            #Wyświetlenie informacji jaka opcja wybrana w labelu
+           label: QLabel = QLabel("")
+           layout.addWidget(label)
+           self.label = label
+           self.setLayout(layout)
+
+       def on_radio_button_changed(self) -> None:
+           radio_button = self.sender()
+           if radio_button.isChecked():
+               self.label.setText(f"Wybrano: {radio_button.text()}")
+
+
+
+    if __name__ == "__main__":
+       app = QApplication(sys.argv)
+       window = MyWindow()
+       window.show()
+       sys.exit(app.exec())
+    ```
+
+*   **Wybrane metody:**
+    *   `setText(text: str)`: Ustawia tekst przycisku opcji.
+    *   `isChecked()`: Zwraca `True`, jeśli przycisk jest zaznaczony.
+    *   `setChecked(checked: bool)`: Ustawia stan przycisku opcji.
+    *   `toggled.connect(slot)`: Podłącza sygnał zmiany stanu do slotu.
+
+#### 1.1.6. QComboBox
+
+*   **Opis:** Lista rozwijana z wyborem opcji.
+*   **Przykłady:**
+
+    ```python
+    from PyQt6.QtWidgets import QComboBox, QWidget, QVBoxLayout, QApplication, QLabel
+    import sys
+    class MyWindow(QWidget):
+        def __init__(self) -> None:
+            super().__init__()
+
+            layout: QVBoxLayout = QVBoxLayout()
+
+            # Lista rozwijana
+            combo_box: QComboBox = QComboBox()
+            combo_box.addItems(["Opcja 1", "Opcja 2", "Opcja 3"])
+            combo_box.currentIndexChanged.connect(self.on_combo_box_changed)
+            layout.addWidget(combo_box)
+
+
+           #Wyświetlenie informacji jaka opcja wybrana w labelu
+            label: QLabel = QLabel("")
+            layout.addWidget(label)
+            self.label = label
+            self.setLayout(layout)
+
+        def on_combo_box_changed(self, index: int) -> None:
+           self.label.setText(f"Wybrano: {index}")
+
+    if __name__ == "__main__":
+        app = QApplication(sys.argv)
+        window = MyWindow()
+        window.show()
+        sys.exit(app.exec())
+    ```
+
+*   **Wybrane metody:**
+    *   `addItem(text: str)`: Dodaje pozycję do listy.
+    *   `addItems(texts: list[str])`: Dodaje wiele pozycji do listy.
+    *   `currentIndex()`: Zwraca indeks wybranej pozycji.
+    *   `currentText()`: Zwraca tekst wybranej pozycji.
+    *   `currentIndexChanged.connect(slot)`: Podłącza sygnał zmiany indeksu do slotu.
+
+### 1.2. Widgety do wyświetlania i edycji tekstu
+
+#### 1.2.1. QTextEdit
+
+*   **Opis:** Wielo liniowe pole edycji tekstu z obsługą formatowania.
+*   **Przykłady:**
+
+    ```python
+    from PyQt6.QtWidgets import QTextEdit, QWidget, QVBoxLayout, QApplication
+    import sys
+    class MyWindow(QWidget):
+        def __init__(self) -> None:
+            super().__init__()
+
+            layout: QVBoxLayout = QVBoxLayout()
+
+            # Pole edycji z formatowaniem
+            text_edit: QTextEdit = QTextEdit()
+            text_edit.setText("<b>Tekst</b> <i>formatowany</i>")
+            layout.addWidget(text_edit)
+
+
+            self.setLayout(layout)
+
+
+    if __name__ == "__main__":
+        app = QApplication(sys.argv)
+        window = MyWindow()
+        window.show()
+        sys.exit(app.exec())
+    ```
+
+*   **Wybrane metody:**
+    *   `setText(text: str)`: Ustawia tekst pola edycji.
+    *   `toPlainText()`: Pobiera tekst z pola edycji bez formatowania.
+    *   `toHtml()`: Pobiera tekst z pola edycji z formatowaniem.
+    *   `setHtml(html: str)`: Ustawia tekst z formatowaniem HTML.
+    *   `clear()`: Czyści zawartość pola edycji.
+
+#### 1.2.2. QPlainTextEdit
+
+*   **Opis:** Wielo liniowe pole edycji tekstu bez formatowania.
+*   **Przykłady:**
+
+    ```python
+    from PyQt6.QtWidgets import QPlainTextEdit, QWidget, QVBoxLayout, QApplication
+    import sys
+    class MyWindow(QWidget):
+        def __init__(self) -> None:
+            super().__init__()
+
+            layout: QVBoxLayout = QVBoxLayout()
+
+            # Pole edycji bez formatowania
+            plain_text_edit: QPlainTextEdit = QPlainTextEdit()
+            plain_text_edit.setPlainText("tekst bez formatowania")
+            layout.addWidget(plain_text_edit)
+
+
+            self.setLayout(layout)
+    if __name__ == "__main__":
+        app = QApplication(sys.argv)
+        window = MyWindow()
+        window.show()
+        sys.exit(app.exec())
+
+    ```
+
+*   **Wybrane metody:**
+    *   `setPlainText(text: str)`: Ustawia tekst pola edycji.
+    *   `toPlainText()`: Pobiera tekst z pola edycji.
+    *   `clear()`: Czyści zawartość pola edycji.
+    *   `appendPlainText(text: str)`: Dopisuje tekst na końcu pola.
+    *   `insertPlainText(text: str)`: Wstawia tekst w miejscu kursora.
+
+### 1.3. Kontenery
+
+#### 1.3.1. QFrame
+
+*   **Opis:** Ramka, na której można umieszczać inne widgety.
+*   **Przykłady:**
+
+    ```python
+    from PyQt6.QtWidgets import QFrame, QWidget, QVBoxLayout, QApplication, QLabel, QPushButton
+    from PyQt6.QtCore import Qt
+    import sys
+    class MyWindow(QWidget):
+        def __init__(self) -> None:
+            super().__init__()
+
+            layout: QVBoxLayout = QVBoxLayout()
+
+            # Ramka
+            frame: QFrame = QFrame()
+            frame.setFrameShape(QFrame.Shape.Box)
+            frame.setFrameShadow(QFrame.Shadow.Raised)
+            frame_layout: QVBoxLayout = QVBoxLayout()
+            frame_layout.addWidget(QLabel("Widget w ramce"))
+            frame_layout.addWidget(QPushButton("Przycisk w ramce"))
+            frame.setLayout(frame_layout)
+
+            layout.addWidget(frame)
+
+
+            self.setLayout(layout)
+
+
+    if __name__ == "__main__":
+        app = QApplication(sys.argv)
+        window = MyWindow()
+        window.show()
+        sys.exit(app.exec())
+    ```
+
+*   **Wybrane metody:**
+    *   `setFrameShape(shape: QFrame.Shape)`: Ustawia kształt ramki (np. `QFrame.Shape.Box`).
+    *   `setFrameShadow(shadow: QFrame.Shadow)`: Ustawia cień ramki (np. `QFrame.Shadow.Raised`).
+    *   `setLineWidth(width: int)`: Ustawia szerokość linii ramki.
+    *    `setLayout(layout)` Ustawia layout w ramce
+
+#### 1.3.2. QWidget
+
+*   **Opis:** Bazowy widget, który może zawierać inne widgety.
+*   **Przykłady:**
+
+    ```python
+    from PyQt6.QtWidgets import QWidget, QVBoxLayout, QApplication, QLabel, QPushButton
+    import sys
+
+    class MyCustomWidget(QWidget):
+       def __init__(self) -> None:
+           super().__init__()
+           layout: QVBoxLayout = QVBoxLayout()
+           layout.addWidget(QLabel("Własny widget"))
+           layout.addWidget(QPushButton("Przycisk"))
+           self.setLayout(layout)
+
+
+    class MyWindow(QWidget):
+        def __init__(self) -> None:
+            super().__init__()
+
+            layout: QVBoxLayout = QVBoxLayout()
+
+            #Własny widget
+            custom_widget: MyCustomWidget = MyCustomWidget()
+            layout.addWidget(custom_widget)
+
+
+            self.setLayout(layout)
+    if __name__ == "__main__":
+        app = QApplication(sys.argv)
+        window = MyWindow()
+        window.show()
+        sys.exit(app.exec())
+    ```
+*   **Wybrane metody:**
+    *   `setLayout(layout: QLayout)`: Ustawia layout widgetu.
+    *   `setParent(parent: QWidget)`: Ustawia rodzica widgetu.
+    *   `setStyleSheet(style: str)`: Ustawia styl CSS widgetu.
+    *  `setGeometry(x: int, y: int, w: int, h: int)`: Ustawia geometrię widgetu.
+
+## 2. Layouty
+
+### 2.1. QVBoxLayout
+*   **Opis:** Ustawia widgety pionowo.
+
+* **Przykłady**
+
+   ```python
+    from PyQt6.QtWidgets import QVBoxLayout, QWidget, QApplication, QPushButton, QLabel
+    import sys
+    class MyWindow(QWidget):
+        def __init__(self) -> None:
+            super().__init__()
+            layout: QVBoxLayout = QVBoxLayout()
+            layout.addWidget(QLabel("Widget 1"))
+            layout.addWidget(QPushButton("Widget 2"))
+            layout.addWidget(QLabel("Widget 3"))
+            self.setLayout(layout)
+
+    if __name__ == "__main__":
+        app: QApplication = QApplication(sys.argv)
+        window: MyWindow = MyWindow()
+        window.show()
+        sys.exit(app.exec())
+   ```
+
+* **Wybrane metody**
+   *   `addWidget(widget: QWidget)`: Dodaje widget do layoutu.
+   *   `addLayout(layout: QLayout)`: Dodaje podlayout do layoutu.
+   *   `insertWidget(index: int, widget: QWidget)`: Wstawia widget na określonej pozycji.
+   *    `setSpacing(spacing: int)`: Ustawia odstęp między widgetami.
+
+### 2.2. QHBoxLayout
+
+*   **Opis:** Ustawia widgety poziomo.
+* **Przykłady**
+
+    ```python
+    from PyQt6.QtWidgets import QHBoxLayout, QWidget, QApplication, QPushButton, QLabel
+    import sys
+    class MyWindow(QWidget):
+        def __init__(self) -> None:
+            super().__init__()
+            layout: QHBoxLayout = QHBoxLayout()
+            layout.addWidget(QLabel("Widget 1"))
+            layout.addWidget(QPushButton("Widget 2"))
+            layout.addWidget(QLabel("Widget 3"))
+            self.setLayout(layout)
+
+    if __name__ == "__main__":
+        app: QApplication = QApplication(sys.argv)
+        window: MyWindow = MyWindow()
+        window.show()
+        sys.exit(app.exec())
+    ```
+
+* **Wybrane metody**
+   *   `addWidget(widget: QWidget)`: Dodaje widget do layoutu.
+   *   `addLayout(layout: QLayout)`: Dodaje podlayout do layoutu.
+   *   `insertWidget(index: int, widget: QWidget)`: Wstawia widget na określonej pozycji.
+   *    `setSpacing(spacing: int)`: Ustawia odstęp między widgetami.
+
+### 2.3. QGridLayout
+
+*   **Opis:** Ustawia widgety w siatce.
+*   **Przykłady:**
+
+    ```python
+    from PyQt6.QtWidgets import QGridLayout, QWidget, QApplication, QLabel, QPushButton
+    import sys
+    class MyWindow(QWidget):
+        def __init__(self) -> None:
+            super().__init__()
+            layout: QGridLayout = QGridLayout()
+            layout.addWidget(QLabel("Widget 1"), 0, 0)
+            layout.addWidget(QPushButton("Widget 2"), 0, 1)
+            layout.addWidget(QLabel("Widget 3"), 1, 0)
+            layout.addWidget(QPushButton("Widget 4"), 1, 1)
+
+            self.setLayout(layout)
+    if __name__ == "__main__":
+        app = QApplication(sys.argv)
+        window = MyWindow()
+        window.show()
+        sys.exit(app.exec())
+    ```
+
+*   **Wybrane metody:**
+    *   `addWidget(widget: QWidget, row: int, column: int, rowspan: int = 1, columnspan: int = 1)`: Dodaje widget na określonej pozycji.
+    *   `addLayout(layout: QLayout, row: int, column: int, rowspan: int = 1, columnspan: int = 1)`: Dodaje podlayout na określonej pozycji.
+    *   `setRowStretch(row: int, stretch: int)`: Ustawia współczynnik rozciągania dla wiersza.
+    *   `setColumnStretch(column: int, stretch: int)`: Ustawia współczynnik rozciągania dla kolumny.
+
+### 2.4. QFormLayout
+* **Opis:** Layout do tworzenia formularzy.
+* **Przykłady**
+
+    ```python
+    from PyQt6.QtWidgets import QFormLayout, QWidget, QApplication, QLabel, QLineEdit
+    import sys
+    class MyWindow(QWidget):
+        def __init__(self) -> None:
+            super().__init__()
+            layout: QFormLayout = QFormLayout()
+            layout.addRow("Imię:", QLineEdit())
+            layout.addRow("Nazwisko:", QLineEdit())
+            layout.addRow("Wiek:", QLineEdit())
+            self.setLayout(layout)
+    if __name__ == "__main__":
+        app = QApplication(sys.argv)
+        window = MyWindow()
+        window.show()
+        sys.exit(app.exec())
+    ```
+* **Wybrane metody:**
+   *   `addRow(label: str, widget: QWidget)`: Dodaje wiersz do formularza z etykietą i widgetem.
+   *   `addRow(labelWidget: QWidget, widget: QWidget)`: Dodaje wiersz z widgetem etykiety i widgetem.
+    * `setWidget(row: int, column: QFormLayout.ItemRole, widget: QWidget)`: Ustawia widget na określonej pozycji.
+   *   `setLabelAlignment(alignment: Qt.AlignmentFlag)`: Ustawia wyrównanie etykiet.
+
+## 3. Okna (Windows)
+
+### 3.1. QMainWindow
+
+*   **Opis:** Główne okno aplikacji z paskami menu, narzędziowymi i stanów.
+*   **Przykłady:**
+
+    ```python
+    from PyQt6.QtWidgets import QMainWindow, QApplication, QLabel, QMenu, QMenuBar, QToolBar
+    from PyQt6.QtGui import QAction, QIcon
+    from PyQt6 import QtWidgets
+    import sys
+    class MyMainWindow(QMainWindow):
+        def __init__(self) -> None:
+            super().__init__()
+
+            # Ustawianie centralnego widgetu
+            label: QLabel = QLabel("Główne okno")
+            self.setCentralWidget(label)
+
+            # Tworzenie menu
+            menu_bar: QMenuBar = QMenuBar()
+            file_menu: QMenu = QMenu("Plik")
+            menu_bar.addMenu(file_menu)
+
+            # Dodawanie akcji do menu
+            exit_action: QAction = QAction("Wyjdź", self)
+            exit_action.triggered.connect(self.close)
+            file_menu.addAction(exit_action)
+            self.setMenuBar(menu_bar)
+
+             # Tworzenie paska narzędzi
+            toolbar: QToolBar = QToolBar()
+            toolbar.addAction(QIcon(self.style().standardIcon(QtWidgets.QStyle.StandardPixmap.SP_DialogSaveButton)), "Zapisz", lambda: print("Zapisano"))
+            self.addToolBar(toolbar)
+    if __name__ == "__main__":
+        app = QApplication(sys.argv)
+        window = MyMainWindow()
+        window.show()
+        sys.exit(app.exec())
+    ```
+
+*   **Wybrane metody:**
+    *   `setCentralWidget(widget: QWidget)`: Ustawia centralny widget okna.
+    *   `setMenuBar(menuBar: QMenuBar)`: Ustawia pasek menu okna.
+    *   `addToolBar(toolBar: QToolBar)`: Dodaje pasek narzędzi okna.
+    *   `statusBar()`: Zwraca pasek stanu okna.
+    *   `menuBar()`: Zwraca pasek menu okna.
+
+### 3.2. QDialog
+*   **Opis:** Okno dialogowe do wyświetlania okien z komunikatami lub opcjami.
+*  **Przykłady**
+
+    ```python
+    from PyQt6.QtWidgets import QDialog, QApplication, QLabel, QPushButton, QVBoxLayout
+    import sys
+
+    class MyDialog(QDialog):
+        def __init__(self) -> None:
+            super().__init__()
+            self.setWindowTitle("Okno dialogowe")
+            layout: QVBoxLayout = QVBoxLayout()
+            layout.addWidget(QLabel("To jest okno dialogowe"))
+            button: QPushButton = QPushButton("Zamknij")
+            button.clicked.connect(self.close)
+            layout.addWidget(button)
+            self.setLayout(layout)
+
+    class MyWindow(QWidget):
+        def __init__(self) -> None:
+            super().__init__()
+            layout: QVBoxLayout = QVBoxLayout()
+            button: QPushButton = QPushButton("Otwórz okno dialogowe")
+            button.clicked.connect(self.open_dialog)
+            layout.addWidget(button)
+            self.setLayout(layout)
+
+        def open_dialog(self) -> None:
+            dialog = MyDialog()
+            dialog.exec()
+
+    if __name__ == "__main__":
+        app: QApplication = QApplication(sys.argv)
+        window: MyWindow = MyWindow()
+        window.show()
+        sys.exit(app.exec())
+    ```
+*   **Wybrane metody:**
+    *   `exec()`: Wyświetla okno dialogowe i blokuje resztę aplikacji.
+    *   `accept()`: Zamyka okno dialogowe z kodem akceptacji.
+    *   `reject()`: Zamyka okno dialogowe z kodem odrzucenia.
+    *   `setModal(modal: bool)`: Ustawia okno dialogowe jako modalne.
+
+### 3.3. QMessageBox
+
+*   **Opis:** Okno z wbudowanymi dialogami komunikatów (informacja, ostrzeżenie, błąd).
+*   **Przykłady:**
+
+    ```python
+    from PyQt6.QtWidgets import QMessageBox, QWidget, QVBoxLayout, QApplication, QPushButton
+    import sys
+    class MyWindow(QWidget):
+        def __init__(self) -> None:
+            super().__init__()
+            layout: QVBoxLayout = QVBoxLayout()
+            button_info: QPushButton = QPushButton("Pokaż informację")
+            button_info.clicked.connect(self.show_info)
+            layout.addWidget(button_info)
+
+            button_warn: QPushButton = QPushButton("Pokaż ostrzeżenie")
+            button_warn.clicked.connect(self.show_warn)
+            layout.addWidget(button_warn)
+
+            button_error: QPushButton = QPushButton("Pokaż błąd")
+            button_error.clicked.connect(self.show_error)
+            layout.addWidget(button_error)
+            self.setLayout(layout)
+
+        def show_info(self) -> None:
+            QMessageBox.information(self, "Informacja", "To jest informacja.")
+
+        def show_warn(self) -> None:
+            QMessageBox.warning(self, "Ostrzeżenie", "To jest ostrzeżenie.")
+
+        def show_error(self) -> None:
+            QMessageBox.critical(self, "Błąd", "To jest błąd.")
+
+    if __name__ == "__main__":
+       app = QApplication(sys.argv)
+       window = MyWindow()
+       window.show()
+       sys.exit(app.exec())
+    ```
+
+*   **Wybrane metody:**
+    *   `information(parent: QWidget, title: str, text: str)`: Wyświetla okno z informacją.
+    *   `warning(parent: QWidget, title: str, text: str)`: Wyświetla okno z ostrzeżeniem.
+    *   `critical(parent: QWidget, title: str, text: str)`: Wyświetla okno z błędem.
+    *   `question(parent: QWidget, title: str, text: str)`: Wyświetla okno z pytaniem.
+    *   `getText(parent: QWidget, title: str, label: str)`: Wyświetla okno do wprowadzania tekstu.
+
+## 4. Sygnały i sloty
+
+### 4.1. Podłączanie sygnałów do slotów
+```python
+# self.ui.my_button to obiekt przycisku z interfejsu
+self.ui.my_button.clicked.connect(self.on_button_clicked)
+def on_button_clicked(self) -> None:
+   self.ui.my_label.setText("Przycisk kliknięty!")
+```
+### 4.2. Sygnały z wbudowanymi parametrami
+```python
+self.ui.my_line_edit.textChanged.connect(self.on_text_changed)
+def on_text_changed(self, text: str) -> None:
+    print(text)
+```
+
+### 4.3. Tworzenie własnych sygnałów
+
+```python
+from PyQt6.QtCore import pyqtSignal, QObject
+class MyEmitter(QObject):
+  my_signal = pyqtSignal(str)
+  def emit_signal(self, text: str) -> None:
+      self.my_signal.emit(text)
+
+emitter = MyEmitter()
+emitter.my_signal.connect(lambda text: print(f"Sygnał: {text}"))
+emitter.emit_signal("Hello world")
+```
+## 5. Style (QSS)
+### 5.1. Zastosowanie styli
+
+```python
+from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel
+import sys
+class MyWindow(QWidget):
+    def __init__(self) -> None:
+        super().__init__()
+        layout: QVBoxLayout = QVBoxLayout()
+        button: QPushButton = QPushButton("Przycisk")
+        label: QLabel = QLabel("Etykieta")
+        layout.addWidget(button)
+        layout.addWidget(label)
+        self.setLayout(layout)
+
+
+        app: QApplication = QApplication(sys.argv)
+        app.setStyleSheet("QPushButton {background-color: red;}") #styl globalny
+        self.setStyleSheet("QLabel {color: blue;}") # styl dla okna
+        label.setStyleSheet("font-size: 20px;") #styl dla label
+if __name__ == "__main__":
+   app = QApplication(sys.argv)
+   window = MyWindow()
+   window.show()
+   sys.exit(app.exec())
+```
+### 5.2. Selektory i właściwości
+```css
+QPushButton {
+   background-color: #4CAF50;
+   color: white;
+    padding: 10px;
+}
+QPushButton:hover {
+   background-color: #367C39;
+}
+QLabel {
+  font-size: 16px;
+  color: #333;
+}
+```
